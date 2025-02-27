@@ -1,6 +1,6 @@
 import { traceable } from "langsmith/traceable";
 import { NextResponse } from 'next/server';
-
+import { AISDKExporter } from "langsmith/vercel";
 // Set max duration for serverless function
 export const maxDuration = 300;
 

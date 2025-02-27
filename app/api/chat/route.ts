@@ -2,6 +2,7 @@ import { createMem0, addMemories } from '@mem0/vercel-ai-provider';
 import { streamText } from 'ai';
 import { Pool } from 'pg';
 import { OpenAI } from 'openai';
+import { AISDKExporter } from 'langsmith/vercel';
 
 // Initialize OpenAI clients
 const openai = new OpenAI({
@@ -247,6 +248,7 @@ Documentation Context: ${similarContent}`;
         user_id: userId,
       }),
       messages: updatedMessages,
+      experimental_telemetry: AISDKExporter.getSettings(),
     });
 
     const responseEndTime = performance.now();
