@@ -3,7 +3,8 @@ import { streamText } from 'ai';
 import { Pool } from 'pg';
 import { OpenAI } from 'openai';
 import { AISDKExporter } from 'langsmith/vercel';
-
+import { z } from "zod";
+import { tool } from "ai";
 // Initialize OpenAI clients
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -248,7 +249,22 @@ Documentation Context: ${similarContent}`;
         user_id: userId,
       }),
       messages: updatedMessages,
+      tools: {
+        listOrders: tool({
+          description: "list all orders",
+          parameters: z.object({ userId: z.string() }),
+          execute: async ({ userId }) =>
+            `User ${userId} has the following orders: 1`,
+        }),
+        viewTrackingInformation: tool({
+          description: "view tracking information for a specific order",
+          parameters: z.object({ orderId: z.string() }),
+          execute: async ({ orderId }) =>
+            `Here is the tracking information for ${orderId}`,
+        }),
+      },
       experimental_telemetry: AISDKExporter.getSettings(),
+      maxSteps: 10,
     });
 
     const responseEndTime = performance.now();
