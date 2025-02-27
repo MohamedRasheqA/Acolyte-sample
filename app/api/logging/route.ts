@@ -9,11 +9,9 @@ interface LogData {
 }
 
 const storeInteraction = traceable(
-  (userId: string,question: string, response: string) => {
-    // Add your storage logic here
-    // For example, storing in a database or sending to an analytics service
+  (userId: string, question: string, response: string) => {
     console.log('Storing interaction:', { userId, question, response });
-    
+    return { userId, question, response }; // Return a value for proper tracing
   }
 );
 
