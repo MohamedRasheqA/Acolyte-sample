@@ -12,11 +12,9 @@ interface LogData {
 const storeInteraction = traceable(
   async(userId: string, question: string, response: string) => {
     try {
-      const userid = userId;
-      const questions = question;
-      const responses = response;
+     
       console.log('Storing interaction:', { userId, question, response });
-      return { userid, questions, responses }; // Return complete data for tracing
+      return { response }; // Return complete data for tracing
     } catch (error) {
       console.error('Failed to store interaction:', error);
       throw error;
