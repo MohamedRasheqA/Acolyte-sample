@@ -9,9 +9,11 @@ interface LogData {
 }
 
 const storeInteraction = traceable(
-  (userId: string, question: string, response: string) => {
+  async(userId: string, question: string, response: string) => {
     console.log('Storing interaction:', { userId, question, response });
     return { userId, question, response }; // Return a value for proper tracing
+  },{
+    name: 'storeInteraction',
   }
 );
 
@@ -20,8 +22,8 @@ export async function POST(request: Request) {
     const {userId, question, response}: LogData = await request.json();
     
     await storeInteraction(userId, question, response);
-    
     return NextResponse.json({ success: true });
+   
   } catch (error) {
     console.error('Error in logging route:', error);
     return NextResponse.json(
