@@ -414,6 +414,7 @@ export default function ChatPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'status': '200'
         },
         body: JSON.stringify({
           userId,
