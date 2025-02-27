@@ -1,9 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig = {
+module.exports = {
   experimental: {
     instrumentationHook: true,
   },
-} as NextConfig;
-
-export default nextConfig;
+}
