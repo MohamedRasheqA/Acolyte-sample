@@ -1,4 +1,5 @@
-import { traceable } from 'langsmith/traceable';
+import { traceable } from "langsmith/traceable";
+import { wrapOpenAI } from "langsmith/wrappers";
 import { NextResponse } from 'next/server';
 const maxDuration = 300;
 interface LogData {
@@ -10,8 +11,16 @@ interface LogData {
 
 const storeInteraction = traceable(
   async(userId: string, question: string, response: string) => {
-    console.log('Storing interaction:', { userId, question, response });
-    return { userId, question, response }; // Return a value for proper tracing
+    try {
+      const userid = userId;
+      const questions = question;
+      const responses = response;
+      console.log('Storing interaction:', { userId, question, response });
+      return { userid, questions, responses }; // Return complete data for tracing
+    } catch (error) {
+      console.error('Failed to store interaction:', error);
+      throw error;
+    }
   },{
     name: 'storeInteraction',
   }
