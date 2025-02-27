@@ -1,6 +1,6 @@
 import { traceable } from 'langsmith/traceable';
 import { NextResponse } from 'next/server';
-
+export const runtime = "edge";
 interface LogData {
   userId: string;
   timestamp: string;
@@ -11,12 +11,10 @@ interface LogData {
 const storeInteraction = traceable(
   async (userId: string,question: string, response: string): Promise<{ userId: string; question: string; response: string }> => {
     // Add your storage logic here
+    const a = 1
     // For example, storing in a database or sending to an analytics service
     console.log('Storing interaction:', { userId, question, response });
-    return { userId, question, response };
-  },
-  {
-    name: "Store Chat Interaction"
+    return {userId, question, response};
   }
 );
 
