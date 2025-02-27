@@ -1,6 +1,6 @@
 import { traceable } from 'langsmith/traceable';
 import { NextResponse } from 'next/server';
-export const runtime = "edge";
+const maxDuration = 300;
 interface LogData {
   userId: string;
   timestamp: string;
