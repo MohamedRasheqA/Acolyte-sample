@@ -9,12 +9,11 @@ interface LogData {
 }
 
 const storeInteraction = traceable(
-  (userId: string,question: string, response: string): Promise<{ userId: string; question: string; response: string }> => {
+  (userId: string,question: string, response: string) => {
     // Add your storage logic here
-    const a = 1
     // For example, storing in a database or sending to an analytics service
     console.log('Storing interaction:', { userId, question, response });
-    return Promise.resolve({userId, question, response});
+    
   }
 );
 
