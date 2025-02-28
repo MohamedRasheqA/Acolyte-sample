@@ -1,9 +1,12 @@
 import { traceable } from "langsmith/traceable";
 import { NextResponse } from 'next/server';
 import { AISDKExporter } from "langsmith/vercel";
+import { wrapOpenAI } from "langsmith/wrappers";
+import { OpenAI } from "openai";
+
 // Set max duration for serverless function
 export const maxDuration = 300;
-
+const openai = wrapOpenAI(new OpenAI());
 // Define the data structure for logging
 interface LogData {
   userId: string;
@@ -12,27 +15,50 @@ interface LogData {
   response: string;
 }
 
-// Create a traceable function for storing interactions
+// Create a traceable function for LLM interaction
+const createTeachbackCompletion = traceable(
+  async (question: string, answer: string) => {
+    const systemPrompt = `This Teach-Back is an activity where the user practices a skill they just learned in an online course. 
+    The user's response should include:
+    ✔ A clear explanation of key drug pricing benchmarks (AWP, WAC, MAC, NADAC) and how they function.
+    ✔ An analysis of how these benchmarks influence pharmacy costs and reimbursement structures.
+    ✔ A connection to pharmacy benefits consulting, including how understanding benchmarks supports cost management and plan design.`;
+
+    return await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: question },
+        { role: "assistant", content: answer }
+      ],
+    });
+  },
+  { name: "TeachbackCompletion", run_type: "llm" }
+);
+
+// Update the storeInteraction function to include LLM processing
 const storeInteraction = traceable(
   async (userId: string, question: string, response: string) => {
     try {
-      // Generate timestamp on server to ensure consistency
       const timestamp = new Date().toISOString();
       
-      // Log the data being stored (useful for debugging)
+      // Process with LLM
+      const llmResponse = await createTeachbackCompletion(question, response);
+      
       console.log('Storing interaction:', { 
         userId, 
         timestamp,
         questionLength: question.length,
-        responseLength: response.length 
+        responseLength: response.length,
+        llmResponseLength: llmResponse.choices[0]?.message?.content?.length
       });
       
-      // Return complete data for tracing
       return { 
         userId, 
         timestamp, 
         question, 
         response,
+        llmResponse: llmResponse.choices[0]?.message?.content,
         success: true 
       };
     } catch (error) {
@@ -42,7 +68,7 @@ const storeInteraction = traceable(
   },
   {
     name: 'storeInteraction',
-    tags: ['production'], // Add tags to help with filtering in LangSmith
+    tags: ['production'],
   }
 );
 
