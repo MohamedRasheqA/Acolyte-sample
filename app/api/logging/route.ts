@@ -14,7 +14,19 @@ interface LogData {
   response: string;
 }
 const systemPrompt = `Just print the same response you received.`;
-// Create a traceable function for LLM interaction
+// Create a traceable function for OpenAI call
+const createCompletion = traceable(
+  async (question: string, response: string) => {
+    return await openai.chat.completions.create({
+      model: "gpt-4o-mini",  // corrected model name
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `Question: ${question}\nResponse: ${response}` }
+      ],
+    });
+  },
+  { name: "Tracing", run_type: "llm" }
+);
 
 // Health check function to verify LangSmith connectivity
 const checkLangSmithConnectivity = async () => {
@@ -47,15 +59,11 @@ export async function POST(request: Request) {
       );
     }
     
-    await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: `Question: ${question}\nResponse: ${response}` }
-      ],
-    });
+    const result = await createCompletion(question, response);
+    
     return NextResponse.json({ 
       success: true,
+      content: result.choices[0]?.message?.content
     });
     
   } catch (error) {
