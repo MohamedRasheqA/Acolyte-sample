@@ -51,8 +51,7 @@ export async function POST(request: Request) {
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: question },
-        { role: "assistant", content: response }
+        { role: "user", content: `Question: ${question}\nResponse: ${response}` }
       ],
     });
     return NextResponse.json({ 
